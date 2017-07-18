@@ -14,9 +14,10 @@ import java.util.List;
 @Transactional
 public interface IProjectDAO extends CrudRepository<Project,Long> {
 
-    @Query("select p.pid, p.title from Project as p join p.employeeProjects as ep where ep.eid = :eid")
+    @Query("select p.pid as pid, p.title as title from Project as p join p.employeeProjects as ep where ep.eid = :eid")
     List<Project> findByEid(@Param("eid") Integer id);
 
-    //@Query("select p.pid, p.title, p.startedOn, p.projectTechnology from Project as p where p.pid = :pid")
-    Project findByPid(@Param("pid") Long pid);
+    @Query("select p.pid, p.title, p.startedOn, pt.technology from Project as p join p.projectTechnology as pt where p.pid = :pid" +
+            " and p.pid = pt.pid")
+    List<Project> findByPid(@Param("pid") Long pid);
 }

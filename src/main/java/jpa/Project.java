@@ -1,5 +1,7 @@
 package jpa;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
@@ -22,6 +24,11 @@ public class Project {
     @NotNull
     private Timestamp startedOn;
 
+    @JsonIgnore
+    @OneToMany()
+    @JoinColumn(name="pid", insertable=false, updatable=false)
+    private List<ProjectTechnology> projectTechnology;
+
     public List<ProjectTechnology> getProjectTechnology() {
         return projectTechnology;
     }
@@ -29,10 +36,6 @@ public class Project {
     public void setProjectTechnology(List<ProjectTechnology> projectTechnology) {
         this.projectTechnology = projectTechnology;
     }
-
-    @OneToMany()
-    @JoinColumn(name="pid", insertable=false, updatable=false)
-    private List<ProjectTechnology> projectTechnology;
 
     public List<EmployeeProject> getEmployeeProjects() {
         return employeeProjects;
@@ -42,6 +45,7 @@ public class Project {
         this.employeeProjects = employeeProjects;
     }
 
+    @JsonIgnore
     @OneToMany()
     @JoinColumn(name="pid", insertable=false, updatable=false)
     private List<EmployeeProject> employeeProjects;
@@ -79,6 +83,17 @@ public class Project {
 
     public void setStartedOn(Timestamp startedOn) {
         this.startedOn = startedOn;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("Project{");
+        sb.append("pid=").append(pid);
+        sb.append(", title='").append(title).append('\'');
+        sb.append(", startedOn=").append(startedOn);
+        sb.append(", projectTechnology=").append(projectTechnology);
+        sb.append('}');
+        return sb.toString();
     }
 }
 

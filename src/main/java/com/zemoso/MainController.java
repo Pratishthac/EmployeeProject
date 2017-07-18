@@ -1,13 +1,17 @@
 package com.zemoso;
 
+import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.zemoso.DAO.IEmployeeDAO;
 import com.zemoso.DAO.IProjectDAO;
 import jpa.Employee;
 import jpa.Project;
+import jpa.ProjectBrief;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -15,6 +19,7 @@ import java.util.List;
  */
 @EntityScan("jpa")
 @RestController
+@CrossOrigin
 @RequestMapping("employeeDetails")
 public class MainController{
 
@@ -29,7 +34,7 @@ public class MainController{
      Get details of all the employees
      @return  List<Employees>
      */
-    @RequestMapping(value="/employees",method= RequestMethod.GET)
+    @RequestMapping(value="/employees",method= RequestMethod.GET, produces = "application/json")
     public List<Employee> getEmployees() {
 
         List<Employee> employeeList = (List<Employee>)iEmployeeDAO.findAll();
@@ -40,13 +45,21 @@ public class MainController{
      *
      Get the project details of an employee by Employee ID (EID)
      * @param eid
-     * @return ListProjects>
+     * @return List<ProjectBrief>
      */
     @RequestMapping(value="/employeeProjects/{eid}",method= RequestMethod.GET)
-    public List<Project> getEmployeeProjects(@PathVariable("eid")int eid) {
+    @ResponseBody
+    public List<ProjectBrief> getEmployeeProjects(@PathVariable("eid")int eid) {
 
         List<Project> projectList = iProjectDAO.findByEid(eid);
-        return projectList;
+
+        List<ProjectBrief> result = new ArrayList<ProjectBrief>();
+        Iterator itr = projectList.iterator();
+        while(itr.hasNext()){
+            Object[] p = (Object[])itr.next();
+            result.add(new ProjectBrief((Long)p[0],(String)p[1]));
+        }
+        return result;
     }
 
     /**
@@ -56,9 +69,9 @@ public class MainController{
      * @return List<Project>
      */
     @RequestMapping(value="/projectDetails/{pid}",method= RequestMethod.GET)
-    public Project getProjectDetails(@PathVariable("pid")long pid) {
+    public List<Project> getProjectDetails(@PathVariable("pid")long pid) {
 
-        Project project = iProjectDAO.findByPid(pid);
-        return project;
+        List<Project> projects = iProjectDAO.findByPid(pid);
+        return projects;
     }
 }
